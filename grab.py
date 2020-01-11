@@ -31,7 +31,8 @@ def get_authenticated_service():
 def get_video_comments(service, video_id):
     comments = []
     video_id = video_id.replace('https://youtu.be/', '')
-    results = service.commentThreads().list(part='snippet',videoId=video_id,maxResults=100,textFormat='plainText').execute()
+    kwargs = {'part':'snippet','videoId':video_id,'maxResults':20,'textFormat':'plainText'}
+    results = service.commentThreads().list(**kwargs).execute()
  
     while results:
         for item in results['items']:
@@ -46,13 +47,34 @@ def get_video_comments(service, video_id):
  
     return comments
 
+def get_video_informations(service, video_id):
+    informations = {}
+    video_id = video_id.replace('https://youtu.be/', '')
+    kwargs = {'part':'snippet,contentDetails,statistics','id':video_id,'maxResults':20}
+    results = service.videos().list(**kwargs).execute()
+
+    while results:
+        for item in results['items']:
+            contentDetails = item['contentDetails']
+            statistics = item['statistics']
+            informations['duration'] = contentDetails['duration']
+            informations['viewCount'] = statistics['viewCount']
+ 
+        if 'nextPageToken' in results:
+            kwargs['pageToken'] = results['nextPageToken']
+            results = service.videos().list(**kwargs).execute()
+        else:
+            break
+ 
+    return informations
+
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
     # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    print(get_video_comments(service=service, video_id='https://youtu.be/kOHB85vDuow'))
+    print(get_video_informations(service=service, video_id='https://youtu.be/kOHB85vDuow'))
+    
 
 
 #YouTube('https://youtu.be/kOHB85vDuow').streams.first().download()
-print(cred.API_VERSION)

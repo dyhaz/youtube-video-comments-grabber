@@ -1,4 +1,4 @@
-CLIENT_SECRETS_FILE = "client_secret_1000813953191-fv1j67l5agpa832lf4o9evinu87f9n6g.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = "client_secret_543792249690-eguorqugnihs2qv39lkm6rduprcvs6ev.apps.googleusercontent.com.json"
 
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
