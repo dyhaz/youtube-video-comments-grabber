@@ -1,11 +1,12 @@
 import credentials as cred
 import os
 import pickle
+import random
 from pytube import YouTube
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
-
+from google.auth.transport.requests import Request
 
 def get_authenticated_service():
     credentials = None
@@ -68,13 +69,39 @@ def get_video_informations(service, video_id):
  
     return informations
 
+def get_video_links(service, channel_id):
+    links = []
+    channel = service.channels().list(id=channel_id, part="contentDetails,contentOwnerDetails", maxResults=1).execute()
+    uploadsID = channel['items'][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    kwargs = {'part':'snippet,contentDetails', 'playlistId':uploadsID, 'maxResults':50}
+    results = service.playlistItems().list(**kwargs).execute()
+    
+    while results:
+        for item in results['items']:
+            contentDetails = item['contentDetails']
+            links.append(contentDetails['videoId'])
+ 
+        if 'nextPageToken' in results:
+            kwargs['pageToken'] = results['nextPageToken']
+            results = service.playlistItems().list(**kwargs).execute()
+        else:
+            break
+
+    return links
+
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
     # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    print(get_video_informations(service=service, video_id='https://youtu.be/kOHB85vDuow'))
-    
+    videoLinks = get_video_links(service, 'UCzgxx_DM2Dcb9Y1spb9mUJA')
+    videoId = random.choice(list(videoLinks))
 
-
-#YouTube('https://youtu.be/kOHB85vDuow').streams.first().download()
+    if not os.path.exists('downloads/' + videoId + '.mp4'):
+        YouTube('https://youtu.be/' + videoId).streams.first().download()
+        for filename in os.listdir("."): 
+            if '.mp4' in filename:
+                dst = 'downloads/' + videoId + ".mp4"
+                src = filename
+          
+                os.rename(src, dst)
