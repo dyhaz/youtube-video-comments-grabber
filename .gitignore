@@ -2,3 +2,5 @@ __pycache__
 client_secret*.json
 token.pickle
 *.mp4
+*.mp3
+*.webm

@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from moviepy.editor import *
 
 def get_authenticated_service():
     credentials = None
@@ -88,6 +89,10 @@ def get_video_links(service, channel_id):
             break
 
     return links
+    
+def convert_to_mp3(mp4_file):
+    video = VideoFileClip(mp4_file)
+    video.audio.write_audiofile(mp4_file.replace('mp4', 'mp3'))
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
@@ -100,8 +105,8 @@ if __name__ == '__main__':
     if not os.path.exists('downloads/' + videoId + '.mp4'):
         YouTube('https://youtu.be/' + videoId).streams.first().download()
         for filename in os.listdir("."): 
-            if '.mp4' in filename:
+            if '.mp4' in filename or '.webm' in filename:
                 dst = 'downloads/' + videoId + ".mp4"
                 src = filename
-          
                 os.rename(src, dst)
+        convert_to_mp3('downloads/' + videoId + '.mp4')
