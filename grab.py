@@ -1,6 +1,7 @@
 import credentials as cred
 import gifsearch as gif
 import mux
+import post_twitter as tw
 import os
 import pickle
 import random
@@ -106,12 +107,23 @@ if __name__ == '__main__':
     videoId = random.choice(list(videoLinks))
 
     if not os.path.exists('downloads/' + videoId + '.mp4'):
-        YouTube('https://youtu.be/' + videoId).streams.first().download()
+        while True:
+            try:
+                YouTube('https://youtu.be/' + videoId).streams.first().download()
+                break
+            except:
+                print('Failed to download video')
+                videoId = random.choice(list(videoLinks))
+
         for filename in os.listdir("."): 
             if '.mp4' in filename or '.webm' in filename:
                 dst = 'downloads/' + videoId + ".mp4"
                 src = filename
                 os.rename(src, dst)
         convert_to_mp3('downloads/' + videoId + '.mp4')
-        urllib.request.urlretrieve(gif.get_gifs_by_keyword('dance')['results'][0]['media'][0]['loopedmp4']['url'], 'downloads/dance' + videoId + '.mp4')
-        mux.combine(videoId)
+
+    image_set = gif.get_gifs_by_keyword('dance')['results']
+    image_result = random.choice(list(image_set))
+    urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/dance' + videoId + '.mp4')
+    mux.combine(videoId)
+    tw.post_video('downloads/output' + videoId + '.mp4')
