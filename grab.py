@@ -136,15 +136,20 @@ if __name__ == '__main__':
                 print('Failed to download video')
                 videoId = random.choice(list(videoLinks))
 
-        for filename in os.listdir("."): 
+        for filename in os.listdir("."):
             if '.mp4' in filename or '.webm' in filename:
                 dst = 'downloads/' + videoId + ".mp4"
                 src = filename
                 os.rename(src, dst)
         convert_to_mp3('downloads/' + videoId + '.mp4')
 
-    image_set = gif.get_gifs_by_keyword('dance')['results']
-    image_result = random.choice(list(image_set))
-    urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/dance' + videoId + '.mp4')
-    mux.combine(videoId)
-    tw.post_video('downloads/output' + videoId + '.mp4')
+    while True:
+        keyword = 'dance'
+        image_set = gif.get_gifs_by_keyword(keyword)['results']
+        image_result = random.choice(list(image_set))
+        duration = image_result['media'][0]['loopedmp4']['duration']
+        if duration >= 3.0:
+            urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/' + keyword + videoId + '.mp4')
+            mux.combine(videoId, keyword)
+            tw.post_video('downloads/output' + videoId + '.mp4')
+            break
