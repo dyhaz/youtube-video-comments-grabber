@@ -1,7 +1,10 @@
 import credentials as cred
+import gifsearch as gif
+import mux
 import os
 import pickle
 import random
+import urllib.request
 from pytube import YouTube
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -89,7 +92,7 @@ def get_video_links(service, channel_id):
             break
 
     return links
-    
+
 def convert_to_mp3(mp4_file):
     video = VideoFileClip(mp4_file)
     video.audio.write_audiofile(mp4_file.replace('mp4', 'mp3'))
@@ -110,3 +113,5 @@ if __name__ == '__main__':
                 src = filename
                 os.rename(src, dst)
         convert_to_mp3('downloads/' + videoId + '.mp4')
+        urllib.request.urlretrieve(gif.get_gifs_by_keyword('dance')['results'][0]['media'][0]['loopedmp4']['url'], 'downloads/dance' + videoId + '.mp4')
+        mux.combine(videoId)

@@ -53,3 +53,4 @@ wrapt==1.11.2
 youtube-mp3-downloader==1.4
 zope.interface==4.6.0
 moviepy
+python-twitter
