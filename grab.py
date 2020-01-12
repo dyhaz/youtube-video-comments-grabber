@@ -93,6 +93,26 @@ def get_video_links(service, channel_id):
             break
 
     return links
+    
+    
+def search_video(service, keyword):
+    links = []
+    i = 0
+    kwargs = {'q':keyword, 'part':'snippet', 'type':'video', 'maxResults':25}
+    results = service.search().list(**kwargs).execute()
+
+    while results:
+        for item in results['items']:
+            links.append(item['id']['videoId'])
+ 
+        if 'nextPageToken' in results and i < 10:
+            kwargs['pageToken'] = results['nextPageToken']
+            results = service.search().list(**kwargs).execute()
+            i += 1
+        else:
+            break
+
+    return links
 
 def convert_to_mp3(mp4_file):
     video = VideoFileClip(mp4_file)
@@ -103,7 +123,8 @@ if __name__ == '__main__':
     # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
-    videoLinks = get_video_links(service, 'UCzgxx_DM2Dcb9Y1spb9mUJA')
+    # videoLinks = get_video_links(service, 'UCzgxx_DM2Dcb9Y1spb9mUJA')
+    videoLinks = search_video(service, 'twice color coded')
     videoId = random.choice(list(videoLinks))
 
     if not os.path.exists('downloads/' + videoId + '.mp4'):
