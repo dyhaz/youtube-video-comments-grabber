@@ -127,15 +127,15 @@ if __name__ == '__main__':
     videoLinks = search_video(service, 'twice color coded')
     videoId = random.choice(list(videoLinks))
 
-    if not os.path.exists('downloads/' + videoId + '.mp4'):
-        while True:
-            try:
-                YouTube('https://youtu.be/' + videoId).streams.first().download()
-                break
-            except:
-                print('Failed to download video')
-                videoId = random.choice(list(videoLinks))
+    while True:
+        try:
+            YouTube('https://youtu.be/' + videoId).streams.first().download()
+            break
+        except:
+            print('Failed to download video')
+            videoId = random.choice(list(videoLinks))
 
+    if not os.path.exists('downloads/' + videoId + '.mp4'):
         for filename in os.listdir("."):
             if '.mp4' in filename or '.webm' in filename:
                 dst = 'downloads/' + videoId + ".mp4"
