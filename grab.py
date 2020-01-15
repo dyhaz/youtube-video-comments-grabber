@@ -1,4 +1,5 @@
 import credentials as cred
+from config import *
 import gifsearch as gif
 import mux
 import post_twitter as tw
@@ -94,7 +95,7 @@ def get_video_links(service, channel_id):
 
     return links
     
-    
+
 def search_video(service, keyword):
     links = []
     i = 0
@@ -124,32 +125,38 @@ if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     service = get_authenticated_service()
     # videoLinks = get_video_links(service, 'UCzgxx_DM2Dcb9Y1spb9mUJA')
-    videoLinks = search_video(service, 'twice color coded')
+    videoLinks = search_video(service, videoName)
     videoId = random.choice(list(videoLinks))
+    retries = 0
 
-    while True:
+    while True and retries <= maxRetries:
         try:
             YouTube('https://youtu.be/' + videoId).streams.first().download()
             break
         except:
-            print('Failed to download video')
+            print('Failed to download video ' + videoId)
             videoId = random.choice(list(videoLinks))
+        
+        retries += 1
+    
+    if retries > maxRetries:
+        print('Max retries exceeded!')
 
-    if not os.path.exists('downloads/' + videoId + '.mp4'):
-        for filename in os.listdir("."):
-            if '.mp4' in filename or '.webm' in filename:
-                dst = 'downloads/' + videoId + ".mp4"
-                src = filename
-                os.rename(src, dst)
-        convert_to_mp3('downloads/' + videoId + '.mp4')
+    else:
+        if not os.path.exists('downloads/' + videoId + '.mp4'):
+            for filename in os.listdir("."):
+                if '.mp4' in filename or '.webm' in filename:
+                    dst = 'downloads/' + videoId + ".mp4"
+                    src = filename
+                    os.rename(src, dst)
+            convert_to_mp3('downloads/' + videoId + '.mp4')
 
-    while True:
-        keyword = 'dance'
-        image_set = gif.get_gifs_by_keyword(keyword)['results']
-        image_result = random.choice(list(image_set))
-        duration = image_result['media'][0]['loopedmp4']['duration']
-        if duration >= 3.0:
-            urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/' + keyword + videoId + '.mp4')
-            mux.combine(videoId, keyword)
-            tw.post_video('downloads/output' + videoId + '.mp4')
-            break
+        while True:
+            image_set = gif.get_gifs_by_keyword(keyword)['results']
+            image_result = random.choice(list(image_set))
+            duration = image_result['media'][0]['loopedmp4']['duration']
+            if duration >= 3.0:
+                urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/' + keyword + videoId + '.mp4')
+                mux.combine(videoId, keyword)
+                tw.post_video('downloads/output' + videoId + '.mp4')
+                break
