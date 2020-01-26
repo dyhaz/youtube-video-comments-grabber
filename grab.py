@@ -7,7 +7,8 @@ import os
 import pickle
 import random
 import urllib.request
-from pytube import YouTube
+# from pytube import YouTube
+import youtube_dl
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -131,7 +132,10 @@ if __name__ == '__main__':
 
     while True and retries <= maxRetries:
         try:
-            YouTube('https://youtu.be/' + videoId).streams.first().download()
+            ydl_opts = {}
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download(['https://youtu.be/' + videoId])
+            # YouTube('https://youtu.be/' + videoId).streams.first().download()
             break
         except:
             print('Failed to download video ' + videoId)
