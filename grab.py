@@ -153,13 +153,14 @@ if __name__ == '__main__':
                     dst = 'downloads/' + videoId + ".mp4"
                     src = filename
                     os.rename(src, dst)
+                    break
             convert_to_mp3('downloads/' + videoId + '.mp4')
 
         while True:
             image_set = gif.get_gifs_by_keyword(keyword)['results']
             image_result = random.choice(list(image_set))
             duration = image_result['media'][0]['loopedmp4']['duration']
-            if duration >= 3.0:
+            if duration >= 3.0 and duration <= 30.0:
                 urllib.request.urlretrieve(image_result['media'][0]['loopedmp4']['url'], 'downloads/' + keyword + videoId + '.mp4')
                 mux.combine(videoId, keyword)
                 tw.post_video('downloads/output' + videoId + '.mp4')
