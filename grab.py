@@ -120,6 +120,11 @@ def convert_to_mp3(mp4_file):
     video = VideoFileClip(mp4_file)
     video.audio.write_audiofile(mp4_file.replace('mp4', 'mp3'))
 
+def download_video(url):
+    ydl_opts = {}
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
     # running in production *do not* leave this option enabled.
@@ -132,9 +137,7 @@ if __name__ == '__main__':
 
     while True and retries <= maxRetries:
         try:
-            ydl_opts = {}
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download(['https://youtu.be/' + videoId])
+            download_video('https://youtu.be/' + videoId)
             # YouTube('https://youtu.be/' + videoId).streams.first().download()
             break
         except:
