@@ -45,7 +45,7 @@ six==1.12.0
 soupsieve==1.9.4
 Twisted==19.7.0
 uritemplate==3.0.1
-urllib3==1.25.6
+urllib3==1.25.8
 w3lib==1.21.0
 wrapt==1.11.2
 youtube-mp3-downloader==1.4
